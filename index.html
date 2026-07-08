@@ -264,6 +264,20 @@
             -webkit-tap-highlight-color: transparent;
         }
         .borc-chip:active { transform: scale(0.96); }
+        .pdf-btn {
+            border: 1px solid #e5d5a8;
+            background: var(--altin-acik);
+            color: #7a5f1e;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .pdf-btn:active { transform: scale(0.96); }
+        .pdf-btn:disabled { opacity: 0.6; }
         .temiz-kart {
             text-align: center; padding: 36px 20px;
             color: var(--yesil);
@@ -955,12 +969,20 @@
                 if (!grup[b.kisi][b.hafta]) grup[b.kisi][b.hafta] = [];
                 grup[b.kisi][b.hafta].push(b);
             });
-            let html = '<p class="bolum-baslik">Önceki haftalardan kalanlar</p>';
+            let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;">
+                <p class="bolum-baslik" style="margin:0 4px;">Önceki haftalardan kalanlar</p>
+                <button class="pdf-btn" id="pdf-btn" onclick="pdfPaylas()">📄 Toplu PDF</button>
+            </div>`;
             Object.keys(grup).forEach(kisi => {
                 const haftalar = grup[kisi];
                 const toplam = Object.values(haftalar).reduce((a, l) => a + l.length, 0);
                 html += `<div class="borc-kart">
-                    <div class="borc-ust"><span class="borc-isim">${kisi}</span><span class="borc-adet">${toplam} eksik</span></div>`;
+                    <div class="borc-ust"><span class="borc-isim">${kisi}</span>
+                        <span style="display:flex;align-items:center;gap:7px;">
+                            <span class="borc-adet">${toplam} eksik</span>
+                            <button class="pdf-btn" style="padding:5px 10px;" onclick="pdfPaylas('${kisi}', this)">📄 PDF</button>
+                        </span>
+                    </div>`;
                 Object.keys(haftalar).sort((a, b) => a - b).forEach(h => {
                     html += `<p class="borc-hafta">HAFTA ${Number(h) + 1}</p><div class="borc-chipler">`;
                     haftalar[h].forEach(b => {
@@ -973,6 +995,104 @@
             });
             html += '<p class="tablo-not">Bir borca dokunarak okundu işaretleyebilirsin</p>';
             kap.innerHTML = html;
+        }
+
+        // --- PDF paylaş ---
+        let html2pdfYuklendi = null;
+        function html2pdfYukle() {
+            if (html2pdfYuklendi) return html2pdfYuklendi;
+            html2pdfYuklendi = new Promise((tamam, hata) => {
+                const s = document.createElement('script');
+                s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+                s.onload = tamam;
+                s.onerror = () => { html2pdfYuklendi = null; hata(new Error('cdn')); };
+                document.head.appendChild(s);
+            });
+            return html2pdfYuklendi;
+        }
+
+        function pdfRaporuOlustur(kisiFiltre) {
+            let borclar = borclariHesapla();
+            if (kisiFiltre) borclar = borclar.filter(b => b.kisi === kisiFiltre);
+            const grup = {};
+            borclar.forEach(b => {
+                if (!grup[b.kisi]) grup[b.kisi] = {};
+                if (!grup[b.kisi][b.hafta]) grup[b.kisi][b.hafta] = [];
+                grup[b.kisi][b.hafta].push(b.etiket);
+            });
+            const bugun = new Date();
+            const tarih = bugun.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+            let html = `<div style="font-family:Georgia,serif;color:#2c3345;padding:24px 28px;background:#fff;">
+                <div style="text-align:center;border-bottom:2px solid #b8912f;padding-bottom:12px;">
+                    <div style="font-size:22px;font-weight:bold;">☪ 3 Aylar Cetele — Kalan Okumalar${kisiFiltre ? ' • ' + kisiFiltre : ''}</div>
+                    <div style="font-size:12px;color:#8a8676;margin-top:4px;">Hafta ${getHaftaNumarasi() + 1} itibarıyla • ${tarih} • Toplam ${borclar.length} eksik</div>
+                </div>`;
+            Object.keys(grup).forEach(kisi => {
+                const haftalar = grup[kisi];
+                const toplam = Object.values(haftalar).reduce((a, l) => a + l.length, 0);
+                html += `<div style="page-break-inside:avoid;margin-top:18px;">
+                    <div style="font-size:16px;font-weight:bold;border-bottom:1px solid #ece4d4;padding-bottom:4px;">${kisi} <span style="font-size:11px;color:#b3452f;font-weight:normal;">(${toplam} eksik)</span></div>`;
+                Object.keys(haftalar).sort((a, b) => a - b).forEach(h => {
+                    html += `<div style="margin:7px 0 0 6px;page-break-inside:avoid;">
+                        <span style="font-size:11px;font-weight:bold;color:#7a5f1e;">Hafta ${Number(h) + 1}:</span>
+                        <span style="font-size:11px;line-height:1.7;">${haftalar[h].join(' • ')}</span>
+                    </div>`;
+                });
+                html += '</div>';
+            });
+            html += `<div style="margin-top:22px;text-align:center;font-size:10px;color:#8a8676;">Telegram botu verileriyle eş zamanlı — karakartal38.github.io/3aylar-cetele</div></div>`;
+            return html;
+        }
+
+        async function pdfPaylas(kisiFiltre, btn) {
+            if (!btn) btn = document.getElementById('pdf-btn');
+            const eskiYazi = btn ? btn.textContent : '';
+            if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
+            try {
+                await html2pdfYukle();
+                const el = document.createElement('div');
+                el.innerHTML = pdfRaporuOlustur(kisiFiltre);
+                el.style.cssText = 'position:fixed;left:-10000px;top:0;width:794px;';
+                document.body.appendChild(el);
+                const dosyaAdi = 'kalanlar-hafta-' + (getHaftaNumarasi() + 1) +
+                    (kisiFiltre ? '-' + kisiFiltre.toLowerCase().replace(/[^a-z0-9]/gi, '') : '') + '.pdf';
+                const secenekler = {
+                    margin: [8, 6, 10, 6],
+                    filename: dosyaAdi,
+                    image: { type: 'jpeg', quality: 0.92 },
+                    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: ['css', 'legacy'] }
+                };
+                const worker = html2pdf().set(secenekler).from(el.firstElementChild);
+                const blob = await worker.outputPdf('blob');
+                document.body.removeChild(el);
+                const dosya = new File([blob], dosyaAdi, { type: 'application/pdf' });
+                if (navigator.canShare && navigator.canShare({ files: [dosya] })) {
+                    try {
+                        await navigator.share({ files: [dosya], title: '3 Aylar Cetele — Kalanlar' + (kisiFiltre ? ' • ' + kisiFiltre : '') });
+                        toast('📄 PDF paylaşıldı');
+                    } catch (e) {
+                        if (e.name !== 'AbortError') pdfIndir(blob, dosyaAdi);
+                    }
+                } else {
+                    pdfIndir(blob, dosyaAdi);
+                }
+            } catch (e) {
+                toast('⚠️ PDF oluşturulamadı, tekrar dene');
+            }
+            if (btn) { btn.disabled = false; btn.textContent = eskiYazi; }
+        }
+
+        function pdfIndir(blob, dosyaAdi) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = dosyaAdi;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
+            toast('📄 PDF indirildi');
         }
 
         // --- Başlangıç ---
