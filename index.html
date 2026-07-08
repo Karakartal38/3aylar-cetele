@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#faf6ee">
+    <title>3 Aylar Cetele</title>
+    <style>
+        :root {
+            --zemin: #faf6ee;
+            --kart: #ffffff;
+            --cizgi: #ece4d4;
+            --metin: #2c3345;
+            --soluk: #8a8676;
+            --altin: #b8912f;
+            --altin-acik: #f3ead2;
+            --yesil: #4a7c59;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--zemin);
+            color: var(--metin);
+            min-height: 100vh;
+        }
+        .serif { font-family: Georgia, "Times New Roman", serif; }
+
+        header {
+            text-align: center;
+            padding: 26px 16px 14px;
+        }
+        header h1 {
+            font-family: Georgia, serif;
+            font-size: 1.45rem;
+            letter-spacing: 0.5px;
+            color: var(--metin);
+        }
+        header h1 .hilal { color: var(--altin); }
+        header .altbaslik { font-size: 0.78rem; color: var(--soluk); margin-top: 3px; font-style: italic; }
+        .hafta-chip {
+            display: inline-block;
+            margin-top: 12px;
+            background: var(--altin-acik);
+            color: #7a5f1e;
+            border: 1px solid #e5d5a8;
+            border-radius: 999px;
+            padding: 6px 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        main { max-width: 480px; margin: 0 auto; padding: 4px 16px 96px; }
+
+        .card {
+            background: var(--kart);
+            border: 1px solid var(--cizgi);
+            border-radius: 18px;
+            padding: 18px;
+            margin-top: 14px;
+            box-shadow: 0 2px 10px rgba(60, 45, 10, 0.05);
+        }
+        .card h3 { font-size: 0.95rem; margin-bottom: 10px; color: var(--metin); }
+
+        .pill-row { display: flex; gap: 8px; margin-bottom: 14px; }
+        .pill {
+            flex: 1;
+            border: 1px solid var(--cizgi);
+            background: var(--zemin);
+            color: var(--soluk);
+            border-radius: 999px;
+            padding: 8px 0;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .pill.aktif { background: var(--altin-acik); border-color: #e5d5a8; color: #7a5f1e; font-weight: 700; }
+
+        .ilham-metin { font-family: Georgia, serif; font-size: 1.02rem; line-height: 1.75; color: var(--metin); }
+        .kaynak { font-size: 0.78rem; color: var(--soluk); text-align: right; margin-top: 10px; }
+
+        .tefaul-btn {
+            display: block; width: 100%;
+            background: linear-gradient(135deg, #c9a53f, #b8912f);
+            color: #fff; border: none;
+            padding: 13px; border-radius: 14px;
+            font-size: 0.95rem; font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 3px 12px rgba(184, 145, 47, 0.3);
+        }
+        .tefaul-btn:active { transform: scale(0.98); }
+        .tefaul-sonuc { margin-top: 14px; padding: 14px; background: var(--zemin); border-radius: 12px; border: 1px solid var(--cizgi); }
+        .tefaul-tur { font-size: 0.72rem; font-weight: 700; color: var(--altin); letter-spacing: 1px; margin-bottom: 6px; }
+
+        .bolum-baslik { font-size: 0.78rem; font-weight: 700; letter-spacing: 1.2px; color: var(--soluk); text-transform: uppercase; margin: 22px 4px 2px; }
+
+        .kisi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+        .kisi-btn {
+            background: var(--kart);
+            border: 1px solid var(--cizgi);
+            border-radius: 16px;
+            padding: 18px 10px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--metin);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(60, 45, 10, 0.05);
+            transition: all 0.15s;
+        }
+        .kisi-btn:active { transform: scale(0.97); }
+        .kisi-btn .nokta { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 8px; }
+
+        .kisi-ust { display: flex; align-items: baseline; justify-content: space-between; margin-top: 18px; padding: 0 4px; }
+        .kisi-ust h2 { font-family: Georgia, serif; font-size: 1.5rem; }
+        .degistir { background: none; border: none; color: var(--altin); font-size: 0.82rem; font-weight: 600; cursor: pointer; text-decoration: underline; }
+        .kalan-not { font-size: 0.78rem; color: var(--yesil); margin: 4px 4px 0; }
+
+        .okuma-listesi { margin-top: 12px; }
+        .okuma-satir {
+            display: flex; align-items: center; gap: 14px;
+            background: var(--kart);
+            border: 1px solid var(--cizgi);
+            border-left: 4px solid var(--c, var(--altin));
+            border-radius: 14px;
+            padding: 13px 15px;
+            margin-bottom: 9px;
+            box-shadow: 0 2px 8px rgba(60, 45, 10, 0.04);
+        }
+        .okuma-satir .ikon { font-size: 1.35rem; width: 30px; text-align: center; }
+        .okuma-satir .kitap { font-size: 0.76rem; color: var(--soluk); }
+        .okuma-satir .deger { font-size: 1.08rem; font-weight: 700; color: var(--metin); margin-top: 1px; }
+        .okuma-satir .deger small { font-size: 0.72rem; font-weight: 400; color: var(--soluk); }
+
+        .gelecek-not {
+            margin-top: 14px; padding: 12px 15px;
+            background: var(--altin-acik);
+            border: 1px solid #e5d5a8;
+            border-radius: 12px;
+            font-size: 0.8rem; color: #7a5f1e; line-height: 1.6;
+        }
+
+        .tablo-kapsul { overflow-x: auto; margin-top: 14px; border-radius: 14px; border: 1px solid var(--cizgi); background: var(--kart); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.74rem; }
+        th { padding: 10px 6px; background: var(--altin-acik); color: #7a5f1e; font-size: 0.7rem; white-space: nowrap; }
+        td { padding: 10px 6px; text-align: center; border-top: 1px solid var(--cizgi); white-space: nowrap; }
+        td:first-child { text-align: left; font-weight: 700; padding-left: 12px; }
+        tr.ben td { background: #fdf7e7; }
+        .tablo-not { font-size: 0.75rem; color: var(--soluk); text-align: center; margin-top: 10px; }
+
+        .tabbar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--cizgi);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+        }
+        .tabbar button {
+            background: none; border: none;
+            font-size: 1.25rem;
+            color: var(--soluk);
+            cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 2px;
+            width: 90px;
+        }
+        .tabbar button span { font-size: 0.68rem; font-weight: 600; }
+        .tabbar button.aktif { color: var(--altin); }
+
+        .sayfa { display: none; animation: girisAnim 0.25s ease-out; }
+        .sayfa.aktif { display: block; }
+        @keyframes girisAnim { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><span class="hilal">☪</span> 3 Aylar Cetele</h1>
+        <p class="altbaslik">Receb • Şaban • Ramazan Okuma Programı</p>
+        <div class="hafta-chip" id="hafta-bilgi">…</div>
+    </header>
+
+    <main>
+        <!-- BUGÜN -->
+        <section id="sayfa-bugun" class="sayfa aktif">
+            <div class="card">
+                <div class="pill-row">
+                    <button class="pill aktif" id="pill-ayet" onclick="ilhamGoster('ayet')">📖 Ayet</button>
+                    <button class="pill" id="pill-hadis" onclick="ilhamGoster('hadis')">🕌 Hadis</button>
+                    <button class="pill" id="pill-risale" onclick="ilhamGoster('risale')">✨ Risale</button>
+                </div>
+                <p class="ilham-metin" id="ilham-metin"></p>
+                <p class="kaynak" id="ilham-kaynak"></p>
+            </div>
+
+            <div class="card">
+                <h3>🎲 Tefeül</h3>
+                <button class="tefaul-btn" onclick="tefaulYap()">Tefeül Et</button>
+                <div class="tefaul-sonuc" id="tefaul-sonuc" style="display:none;">
+                    <p class="tefaul-tur" id="tefaul-tur"></p>
+                    <p class="ilham-metin" id="tefaul-metin" style="font-size:0.92rem;"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- OKUMAM -->
+        <section id="sayfa-okumam" class="sayfa">
+            <div id="okumam-icerik"></div>
+        </section>
+
+        <!-- TABLO -->
+        <section id="sayfa-tablo" class="sayfa">
+            <div class="tablo-kapsul">
+                <table id="dagilim-tablosu"></table>
+            </div>
+            <p class="tablo-not">🔄 Her Cuma sabahı 05:00'te herkes bir sonraki sıraya geçer</p>
+        </section>
+    </main>
+
+    <nav class="tabbar">
+        <button id="tab-bugun" class="aktif" onclick="nav('bugun')">🏠<span>Bugün</span></button>
+        <button id="tab-okumam" onclick="nav('okumam')">📿<span>Okumam</span></button>
+        <button id="tab-tablo" onclick="nav('tablo')">📋<span>Tablo</span></button>
+    </nav>
+
+    <script>
+        // ===== İçerik verileri =====
+        const hadisler = [
+            "Kim Allah'a ve ahiret gününe iman ediyorsa, ya hayır söylesin ya da sussun. (Buhârî, Müslim)",
+            "Kolaylaştırınız, zorlaştırmayınız; müjdeleyiniz, nefret ettirmeyiniz. (Buhârî)",
+            "Müminin niyeti amelinden hayırlıdır. (Taberânî)",
+            "Dua ibadetin özüdür. (Tirmizî)",
+            "Amellerin en hayırlısı az da olsa devamlı olanıdır. (Buhârî, Müslim)",
+            "İnsanlara teşekkür etmeyen Allah'a şükretmez. (Tirmizî)",
+            "Sizden biriniz kendisi için istediğini kardeşi için de istemedikçe gerçek iman etmiş olmaz. (Buhârî, Müslim)",
+            "Güzel söz sadakadır. (Buhârî, Müslim)",
+            "Allah yumuşak davranır ve yumuşak davranmayı sever. (Buhârî, Müslim)",
+            "Cennet annelerin ayakları altındadır. (Nesâî)",
+            "İlim Çin'de de olsa gidip alınız. (İbn Abdilber)",
+            "Sabır acıdır ama meyvesi tatlıdır. (Beyhakî)",
+            "Kim bir hayır yoluna delalet ederse, onu yapan gibi ecir alır. (Müslim)",
+            "Temizlik imanın yarısıdır. (Müslim)",
+            "Hikmet müminin yitiğidir, nerede bulursa alır. (Tirmizî)",
+            "Dünya ahiretin tarlasıdır. (Deylemî)",
+            "Dua belayı def eder. (Tirmizî)",
+            "Komşusu aç iken tok yatan bizden değildir. (Buhârî)",
+            "Müslüman, elinden ve dilinden Müslümanların emin olduğu kimsedir. (Buhârî)",
+            "En hayırlınız, ahlakça en güzel olanınızdır. (Buhârî)"
+        ];
+
+        const ayetler = [
+            { ayet: "Şüphesiz güçlükle beraber bir kolaylık vardır.", kaynak: "İnşirah, 94:5" },
+            { ayet: "Rabbiniz şöyle buyurdu: Bana dua edin, size cevap vereyim.", kaynak: "Mü'min, 40:60" },
+            { ayet: "Allah sabredenleri sever.", kaynak: "Âl-i İmrân, 3:146" },
+            { ayet: "Allah bir toplumun durumunu, onlar kendilerini değiştirmedikçe değiştirmez.", kaynak: "Ra'd, 13:11" },
+            { ayet: "Ve O'nun rahmetinden ümit kesmeyin.", kaynak: "Yûsuf, 12:87" },
+            { ayet: "Kim Allah'a tevekkül ederse O, ona yeter.", kaynak: "Talâk, 65:3" },
+            { ayet: "Biz insanı en güzel biçimde yarattık.", kaynak: "Tîn, 95:4" },
+            { ayet: "Allah'ı çok zikredin ki kurtuluşa eresiniz.", kaynak: "Cumâ, 62:10" },
+            { ayet: "Rabbinizden bağışlanma dileyin. Şüphesiz O, çok bağışlayandır.", kaynak: "Nûh, 71:10" },
+            { ayet: "Allah her zorluğun yanında bir kolaylık yaratır.", kaynak: "Talâk, 65:7" },
+            { ayet: "Ey iman edenler! Sabredin, sabırda yarışın.", kaynak: "Âl-i İmrân, 3:200" },
+            { ayet: "Her nefis ölümü tadıcıdır.", kaynak: "Âl-i İmrân, 3:185" },
+            { ayet: "Şüphesiz Allah adaleti ve iyiliği emreder.", kaynak: "Nahl, 16:90" },
+            { ayet: "Kötülüğü en güzel şekilde defet.", kaynak: "Fussilet, 41:34" },
+            { ayet: "Biz seni ancak âlemlere rahmet olarak gönderdik.", kaynak: "Enbiyâ, 21:107" }
+        ];
+
+        const risaleCumleleri = [
+            "İnsan bu dünyaya ilim ve dua vasıtasıyla tekemmül etmek için gelmiştir. - Bediüzzaman",
+            "Ümitvar olunuz. Şu istikbal inkılâbı içinde en yüksek gür sada İslam'ın sadası olacaktır. - Bediüzzaman",
+            "Zaman ihtiyarladıkça Kur'an gençleşiyor. - Bediüzzaman",
+            "İman hem nurdur hem kuvvettir. - Bediüzzaman",
+            "Dua, ubûdiyetin ruhudur. - Bediüzzaman",
+            "Hayatın lezzeti ve zevki, iman iledir. - Bediüzzaman",
+            "Güzel gören güzel düşünür, güzel düşünen hayatından lezzet alır. - Bediüzzaman",
+            "Bir tek sıdk, bir cemaat kazandırabilir. - Bediüzzaman",
+            "İhlas ile yapılan az amel, çoğuna müreccahtır. - Bediüzzaman",
+            "Kuvvet haktadır, hak kuvvette değildir. - Bediüzzaman"
+        ];
+
+        // Yakaran Gönüller Dua Başlıkları (bot ile aynı liste ve sıra)
+        const yakaranGonullerDualari = [
+            "Sabah Duaları",
+            "Hazreti Ali'nin (k.v.) Hizbü's-Seyf Duası",
+            "Cuma Günü Duası",
+            "Perşembe Günü Duası",
+            "Bazı Büyük Velî Zatların Duaları",
+            "İmam Zeynülâbidîn'in (r.a.) Arefe Günü Duası",
+            "Güven ve Esenlik Talebi İçin Yapılan Dua",
+            "Üveys el-Karanî Hazretleri'nin Bir Virdi",
+            "Pazar Günü İstiğfarı",
+            "Çarşamba Günü İstiğfarı",
+            "İmam Ma'rûf el-Kerhî Hazretleri'nin Bir Duası",
+            "Hizbü'l-İhticab Duası",
+            "Hüsn-ü Hâtime Duası",
+            "Duaların Kabulü ve İhtiyaçların Giderilmesi İçin Dua",
+            "Hizbü'l-Celâle Duası",
+            "Hizbü'l-Fethiyye Duası",
+            "Güzel Bir Virdi",
+            "Hizbü'l-İhlâs (el-Hizbü'l-Kebîr)",
+            "Edellü'l-Hayrât Duası",
+            "Hizbin Hâtimesi",
+            "Salı Gecesi Virdi",
+            "Çarşamba Gecesi Virdi",
+            "Perşembe Gecesi Virdi",
+            "Cuma Gecesi Virdi",
+            "Hizbü't-Tefrîc Duası",
+            "Salâtü'l-Fevâtihi'l-Hakîka Duası",
+            "Salâtü's-Sır Duası",
+            "el-Hizbü'l-Kebîr Duası",
+            "Hizbü't-Tams Duası",
+            "Hizb-i Darbi't-Tams Duası",
+            "Hizbü'l-Hucub Duası",
+            "Evrâd-ı Fethiyye'nin Hitamı",
+            "Seyyid Alî Vefâ'nın On Kelime Hizbi",
+            "Hizbü'n-Necât (Hizbü'l-Afv)",
+            "Hizbü'l-Felâh",
+            "Salavât-ı Şerîfe",
+            "Cuma Günü Virdi: Virdü't-Tahmîd",
+            "Pazar Virdi: Virdü't-Tesbîh",
+            "Salı Virdi: Virdü's-Selam",
+            "Seher Vaktinde Teveccüh Hizbi",
+            "Hizbü'ş-Şükr",
+            "Hizbü't-Teshîr",
+            "Hizbü'l-Âyât",
+            "Nur Duası",
+            "Salavât-ı Şerîfe (İkinci Bölüm)",
+            "Salı Gecesi Hizbi",
+            "Perşembe Gecesi Hizbi",
+            "Cuma Gecesi Hizbi",
+            "Esmâ-i Hüsna Virdi",
+            "İsm-i Celîl Duası",
+            "Enbiya-i İzamdan Bazılarının Duaları",
+            "Hazreti İshak'ın (a.s.) Duası",
+            "Tâbiîn Efendilerimizin Duaları",
+            "Hazreti Enes ibn Mâlik'in Virdi",
+            "Hocaefendi'nin Duaları",
+            "Hazreti Ömer ibn el-Hattâb'ın Duası",
+            "Hazreti Osman'ın Münâcâtü'l-Kur'ân Duası",
+            "Hazreti Ali'nin Cuma Günü Duası",
+            "İmam Gazzâlî'nin Hizbü'l-Hasîn Duası",
+            "Abdülkadir Geylânî'nin el-Hizbü'l-Kebîr Duası",
+            "Hazreti Hasan (r.a.) Efendimiz'in Duası",
+            "İmam Şâzilî Hazretlerinin Hizbi",
+            "Münâcât-ı Üveys el-Karnî"
+        ];
+
+        // ===== Bot ile birebir ayni mantik (era-farkinda) =====
+        const MALI_CIKIS_HAFTA = 27; // ekranda "Hafta 28"
+        const KISILER = ["Oğuz", "Ömer", "Murat", "Feyyaz", "İsmail", "Barış"];
+        const KISILER_ESKI = ["Oğuz", "Mali", "Ömer", "Murat", "Feyyaz", "İsmail", "Barış"];
+        const SURELER = ["Vâkıa", "Mülk", "Secde", "Yâsîn", "Fetih", "Duhân", "Cuma", "Nebe"];
+        const renkler = ['#e91e63', '#2196f3', '#4caf50', '#ff9800', '#9c27b0', '#00bcd4', '#ff5722'];
+        const BASLANGIC = new Date(2025, 11, 19, 5, 0, 0); // 19 Aralık 2025 Cuma 05:00
+
+        const OKUMA_BOLUMLERI = [
+            { cevsen: "1-15", evradiKudsiye: "101-102", delail: "1-4", celc: "1-2", tevhid: "1-17" },
+            { cevsen: "16-30", evradiKudsiye: "103-104", delail: "5-8", celc: "3-4", tevhid: "18-35" },
+            { cevsen: "31-45", evradiKudsiye: "105-106", delail: "9-12", celc: "5-6", tevhid: "36-53" },
+            { cevsen: "46-60", evradiKudsiye: "107-108", delail: "13-16", celc: "7-8", tevhid: "54-71" },
+            { cevsen: "61-75", evradiKudsiye: "109-111", delail: "17-20", celc: "9-10", tevhid: "72-89" },
+            { cevsen: "76-90", evradiKudsiye: "112-114", delail: "21-22", celc: "11-12", tevhid: "90-107" },
+            { cevsen: "91-100", evradiKudsiye: "115-117", delail: "23-24", celc: "13", tevhid: "108-117" }
+        ];
+        // Mali sonrası 6 kişilik tablo (hafta >= 27)
+        const OKUMA_BOLUMLERI_YENI = [
+            { cevsen: "1-17",   evradiKudsiye: "101-103", delail: "1-4",   celc: "1-2",   tevhid: "1-20" },
+            { cevsen: "18-34",  evradiKudsiye: "104-106", delail: "5-8",   celc: "3-4",   tevhid: "21-39" },
+            { cevsen: "35-50",  evradiKudsiye: "107-109", delail: "9-12",  celc: "5-6",   tevhid: "40-59" },
+            { cevsen: "51-67",  evradiKudsiye: "110-112", delail: "13-16", celc: "7-8",   tevhid: "60-78" },
+            { cevsen: "68-84",  evradiKudsiye: "113-115", delail: "17-20", celc: "9-10",  tevhid: "79-98" },
+            { cevsen: "85-100", evradiKudsiye: "116-117", delail: "21-25", celc: "11-13", tevhid: "99-son" }
+        ];
+
+        // Fonksiyonlar
+        function getHaftaNumarasi() {
+            const fark = Date.now() - BASLANGIC.getTime();
+            return Math.max(0, Math.floor(fark / (7 * 24 * 60 * 60 * 1000)));
+        }
+
+        function getKisiler(haftaNo) {
+            return haftaNo < MALI_CIKIS_HAFTA ? KISILER_ESKI : KISILER;
+        }
+
+        function getBolumTablosu(haftaNo) {
+            return haftaNo < MALI_CIKIS_HAFTA ? OKUMA_BOLUMLERI : OKUMA_BOLUMLERI_YENI;
+        }
+
+        function getSonrakiCumaKalan() {
+            const simdi = new Date();
+            let gunKalan = (5 - simdi.getDay() + 7) % 7;
+            if (gunKalan === 0 && simdi.getHours() >= 5) gunKalan = 7;
+            const sonrakiCuma = new Date(simdi);
+            sonrakiCuma.setDate(simdi.getDate() + gunKalan);
+            sonrakiCuma.setHours(5, 0, 0, 0);
+            const fark = sonrakiCuma - simdi;
+            return { 
+                gun: Math.floor(fark / (1000 * 60 * 60 * 24)), 
+                saat: Math.floor((fark % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)) 
+            };
+        }
+
+        function getKisininBolumu(kisiIndex, haftaNo) {
+            if (haftaNo === undefined) haftaNo = getHaftaNumarasi();
+            const tbl = getBolumTablosu(haftaNo);
+            return tbl[(kisiIndex + haftaNo) % tbl.length];
+        }
+
+        function getKisininSuresi(kisiIndex, haftaNo) {
+            if (haftaNo === undefined) haftaNo = getHaftaNumarasi();
+            return SURELER[(kisiIndex + haftaNo) % SURELER.length];
+        }
+
+        function getKisininKuranSayfasi(kisiIndex, haftaNo) {
+            if (haftaNo === undefined) haftaNo = getHaftaNumarasi();
+            const bas = ((haftaNo * 14 + kisiIndex * 2) % 604) + 1;
+            const bit = ((haftaNo * 14 + kisiIndex * 2 + 1) % 604) + 1;
+            return bas + "-" + bit;
+        }
+
+        function getKisininYakaranGonullerDuasi(kisiIndex, haftaNo) {
+            if (haftaNo === undefined) haftaNo = getHaftaNumarasi();
+            return yakaranGonullerDualari[(kisiIndex + haftaNo) % yakaranGonullerDualari.length];
+        }
+
+        // ===== Görünüm =====
+        const KISI_RENKLERI = ['#e91e63', '#2196f3', '#4caf50', '#ff9800', '#9c27b0', '#00bcd4', '#ff5722'];
+        const KITAPLAR = [
+            { ikon: '📖', isim: "Kur'an-ı Kerim", renk: '#5c6bc0', birim: 'sayfa', deger: (i, h) => getKisininKuranSayfasi(i, h) },
+            { ikon: '📜', isim: 'Sure', renk: '#ec407a', birim: '', deger: (i, h) => getKisininSuresi(i, h) },
+            { ikon: '✨', isim: 'Cevşen-ül Kebir', renk: '#b8912f', birim: 'bölüm', deger: (i, h) => getKisininBolumu(i, h).cevsen },
+            { ikon: '📿', isim: 'Evrâd-ı Kudsiye', renk: '#4a7c59', birim: 'sayfa', deger: (i, h) => getKisininBolumu(i, h).evradiKudsiye },
+            { ikon: '📜', isim: "Delâilü'n-Nûr", renk: '#42a5f5', birim: 'sayfa', deger: (i, h) => getKisininBolumu(i, h).delail },
+            { ikon: '🕌', isim: 'Celcelûtiye', renk: '#ef6c00', birim: 'bölüm', deger: (i, h) => getKisininBolumu(i, h).celc },
+            { ikon: '☯', isim: 'Tevhidnâme', renk: '#8e24aa', birim: 'sayfa', deger: (i, h) => getKisininBolumu(i, h).tevhid },
+            { ikon: '🤲', isim: 'Yakaran Gönüller', renk: '#00897b', birim: '', deger: (i, h) => getKisininYakaranGonullerDuasi(i, h) }
+        ];
+
+        function nav(sayfa) {
+            document.querySelectorAll('.sayfa').forEach(s => s.classList.remove('aktif'));
+            document.getElementById('sayfa-' + sayfa).classList.add('aktif');
+            document.querySelectorAll('.tabbar button').forEach(b => b.classList.remove('aktif'));
+            document.getElementById('tab-' + sayfa).classList.add('aktif');
+            if (sayfa === 'okumam') okumamGoster();
+            if (sayfa === 'tablo') tabloRender();
+            window.scrollTo(0, 0);
+        }
+
+        // --- Bugün ---
+        let ilhamTur = 'ayet';
+        function ilhamGoster(tur) {
+            ilhamTur = tur;
+            ['ayet', 'hadis', 'risale'].forEach(t =>
+                document.getElementById('pill-' + t).classList.toggle('aktif', t === tur));
+            const g = new Date().getDate();
+            let metin = '', kaynak = '';
+            if (tur === 'ayet') {
+                const a = ayetler[g % ayetler.length];
+                metin = '"' + a.ayet + '"'; kaynak = '— ' + a.kaynak;
+            } else if (tur === 'hadis') {
+                metin = '"' + hadisler[g % hadisler.length] + '"';
+            } else {
+                metin = '"' + risaleCumleleri[g % risaleCumleleri.length] + '"';
+            }
+            document.getElementById('ilham-metin').textContent = metin;
+            document.getElementById('ilham-kaynak').textContent = kaynak;
+        }
+
+        function tefaulYap() {
+            const tip = Math.floor(Math.random() * 3);
+            let sonuc, tur;
+            if (tip === 0) {
+                const a = ayetler[Math.floor(Math.random() * ayetler.length)];
+                sonuc = '"' + a.ayet + '" — ' + a.kaynak; tur = '📖 AYET';
+            } else if (tip === 1) {
+                sonuc = '"' + hadisler[Math.floor(Math.random() * hadisler.length)] + '"'; tur = '🕌 HADİS';
+            } else {
+                sonuc = '"' + risaleCumleleri[Math.floor(Math.random() * risaleCumleleri.length)] + '"'; tur = '✨ RİSALE';
+            }
+            document.getElementById('tefaul-tur').textContent = tur;
+            document.getElementById('tefaul-metin').textContent = sonuc;
+            document.getElementById('tefaul-sonuc').style.display = 'block';
+        }
+
+        // --- Okumam ---
+        function kayitliKisi() {
+            const haftaNo = getHaftaNumarasi();
+            const isim = localStorage.getItem('cetele_kisi');
+            const idx = getKisiler(haftaNo).indexOf(isim);
+            return idx >= 0 ? idx : null;
+        }
+
+        function okumamGoster() {
+            const idx = kayitliKisi();
+            if (idx === null) kisiSecimRender();
+            else detayRender(idx);
+        }
+
+        function kisiSecimRender() {
+            const haftaNo = getHaftaNumarasi();
+            const kisiler = getKisiler(haftaNo);
+            let html = '<p class="bolum-baslik">İsmini seç</p><div class="kisi-grid">';
+            kisiler.forEach((kisi, i) => {
+                html += `<button class="kisi-btn" onclick="kisiSec('${kisi}')"><span class="nokta" style="background:${KISI_RENKLERI[i % KISI_RENKLERI.length]}"></span>${kisi}</button>`;
+            });
+            html += '</div>';
+            document.getElementById('okumam-icerik').innerHTML = html;
+        }
+
+        function kisiSec(isim) {
+            localStorage.setItem('cetele_kisi', isim);
+            okumamGoster();
+        }
+
+        function kisiDegistir() {
+            localStorage.removeItem('cetele_kisi');
+            kisiSecimRender();
+        }
+
+        function detayRender(idx) {
+            const haftaNo = getHaftaNumarasi();
+            const kalan = getSonrakiCumaKalan();
+            const kisi = getKisiler(haftaNo)[idx];
+
+            let html = `
+                <div class="kisi-ust">
+                    <h2>${kisi}</h2>
+                    <button class="degistir" onclick="kisiDegistir()">değiştir</button>
+                </div>
+                <p class="kalan-not">⏱ Yeni okumaya: ${kalan.gun} gün ${kalan.saat} saat</p>
+                <div class="okuma-listesi">`;
+            KITAPLAR.forEach(k => {
+                const deger = k.deger(idx, haftaNo);
+                html += `
+                    <div class="okuma-satir" style="--c:${k.renk}">
+                        <span class="ikon">${k.ikon}</span>
+                        <div>
+                            <p class="kitap">${k.isim}</p>
+                            <p class="deger">${deger}${k.birim ? ' <small>' + k.birim + '</small>' : ''}</p>
+                        </div>
+                    </div>`;
+            });
+            html += '</div>';
+
+            const gelecekBolum = getKisininBolumu(idx, haftaNo + 1);
+            const gelecekYakaran = getKisininYakaranGonullerDuasi(idx, haftaNo + 1);
+            html += `
+                <div class="gelecek-not">
+                    🔄 <b>Gelecek hafta:</b> Cevşen ${gelecekBolum.cevsen}<br>
+                    Yakaran Gönüller: ${gelecekYakaran}
+                </div>`;
+            document.getElementById('okumam-icerik').innerHTML = html;
+        }
+
+        // --- Tablo ---
+        function tabloRender() {
+            const haftaNo = getHaftaNumarasi();
+            const kisiler = getKisiler(haftaNo);
+            const benIdx = kayitliKisi();
+
+            let html = `
+                <thead><tr>
+                    <th>İsim</th><th>Kur'an</th><th>Sure</th><th>Cevşen</th>
+                    <th>Evrâd</th><th>Delâil</th><th>Celc.</th><th>Tevhid</th><th>Yakaran G.</th>
+                </tr></thead><tbody>`;
+            kisiler.forEach((kisi, i) => {
+                const b = getKisininBolumu(i, haftaNo);
+                const yakaran = getKisininYakaranGonullerDuasi(i, haftaNo);
+                const yk = yakaran.length > 22 ? yakaran.substring(0, 20) + '…' : yakaran;
+                html += `
+                    <tr${i === benIdx ? ' class="ben"' : ''}>
+                        <td>${kisi}</td>
+                        <td>${getKisininKuranSayfasi(i, haftaNo)}</td>
+                        <td>${getKisininSuresi(i, haftaNo)}</td>
+                        <td>${b.cevsen}</td>
+                        <td>${b.evradiKudsiye}</td>
+                        <td>${b.delail}</td>
+                        <td>${b.celc}</td>
+                        <td>${b.tevhid}</td>
+                        <td style="font-size:0.66rem;">${yk}</td>
+                    </tr>`;
+            });
+            html += '</tbody>';
+            document.getElementById('dagilim-tablosu').innerHTML = html;
+        }
+
+        // --- Başlangıç ---
+        function haftaChipGuncelle() {
+            const haftaNo = getHaftaNumarasi();
+            const kalan = getSonrakiCumaKalan();
+            document.getElementById('hafta-bilgi').textContent =
+                `📅 Hafta ${haftaNo + 1} • Yeni okumaya ${kalan.gun}g ${kalan.saat}s`;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            haftaChipGuncelle();
+            ilhamGoster('ayet');
+            setInterval(haftaChipGuncelle, 60000);
+        });
+    </script>
+</body>
+</html>
